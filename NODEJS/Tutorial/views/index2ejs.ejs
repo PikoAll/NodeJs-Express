@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <!-- cosi includo il pezzo di codice generico navbar in tutte le pagine -->
+    <%- include ("partials/nav.ejs") %>
+
+    <h1>Benvenuto <%= nome %>  in questa pagina</h1>
+    <h1> <%= data.eta %> </h1>
+    <h1> <%= data.musica %> </h1>
+    <br>
+    <h1>Hobby</h1>
+    <ul>
+      <% data.hobbies.forEach(function(item){ %>
+          <li> <%= item %> </li>
+      <% });  %>
+    </ul>
+  </body>
+</html>

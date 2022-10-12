@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <!-- -->
+    <%- include ("partials/nav.ejs") %>
+    <h1>Pagina worms</h1>
+    <form method="POST" action="/forms/forms"> <!-- action deve essere uguale all'url del root che corrisponde a questa pagina -->
+      <label for="fname">First name:</label><br>
+      <input type="text"  name="fname" value="John"><br>
+
+      <label for="lname">Last name:</label><br>
+      <input type="text" id="lname" name="lname" value="Doe"><br><br>
+
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>

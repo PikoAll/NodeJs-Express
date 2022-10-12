@@ -1,0 +1,557 @@
+Info utili
+rollback consente di riportare una base di dati a una versione precendete
+tuple = righe della tabella
+
+Primo Video
+Capgemini è un’azienda leader, a molti clienti importanti che hanno grossi basi dati.
+
+Overview & Sqldeveloper (Giorno 1)
+Acronimi
+DB = database
+DMS = database management system
+RDBMS = Relation dataBase management system
+SGA = system global area (area di memoria che forse usa oracle)
+SQL = structured query language
+PL/SQL = procedural languiagge/structured query languagge
+SID = Oracle system identifier (serve per collegarsi a un database)
+AWE = Automatic workload repository (strumento che cerca di capire oracle costa sta facendo, ci da delle tempistiche di performance…)
+cenni storici
+Oracle database è uno degli strumenti DMS piu importanti, oracle nasce in california nel 1977.
+
+Tipi di database disponibili
+RDBMS : database relazionale, il tutto è sottoforma di tabelle con righe e colonne
+DWH : data warehouse, repository centralizzato, usato per query è analisi veloci
+ODBMS : database orientato agli oggetti, le informazioni sono rapresentate sottoforma di ogetti come nella programazzione OO
+NoSQL : database non relazionale, è semi-strutturato e si sta diffondendo con le aplicazioni web
+differenza OLTP - OLAP
+??? minuto 23 fino a più di 28
+
+Database vs Istanza
+database => dati memorizzati (parte fisica, dati strutturati)
+istanza di un database => insieme di processi che interagiscono con i dati (processi oracle) (oracle è fatto in c)
+Organizzazione fisica e logica dei dati
+Tenere in mente che i dati vengono letti e scrtti su un disco rigido.
+
+datafile sono oggetti che organizzano i dati a livello fisico, i datafile sono veri e propri file.
+la gestione logica dei dati, viene rapresentata come: blocks -> extents -> segments -> tablespaces
+
+blocks è la base di un db oracle di 8k, dove ci sono i dati contigui
+extents è un insiebe di bloks contigui la loro dimensione puo variare in base al numero di bloks
+segments è un contenitore di extents
+tablespaces (tbs) che è l’entita piu grossa di raccolta dati che sta dentro oracle, una tablespaces può avere un certo numero di datafile associati
+Ogni istallazione di oracle db prevede che siano istanziati:
+
+tablespace system
+tablespace temp = tbs per elaborazioni temporanee
+segments rollback/undo = segmento per garantire le operazioni di rollback
+struttura dei blocchi
+come detto sopra un blocco assume il valore di 8k, quindi bisogna stare attente ad alcuni parametri al fine di inserire correttamente alcuni dati in una tabella:
+
+PCTFREE : percentuale di spazio del blocco da riservare per i sucessivi update (si lascia solitamente il 10% libero del blocco per permettere quiesti update)
+PCTUSED : percentuale di spazio usato sotto la quale il blocco viene utilizzato per inserire nuove righe
+INITRANS : numero transazioni simultanee, (mettere valori bassi creaa rallentamenti)
+istanza: processi core
+i processi dell’istanza snono:
+
+dbwr : databasepopola i datafie
+arch : copia su archive log
+lgwr : scrive nei log di sistema
+ckpt : adibito ai checkpoint
+smon : processo di monitoring del sistema
+sga : area di memoria
+lo scopo dei processi sopra elencati è quello di garantire la massima sicurezza nella registrazione e nell’acesso ai dati.
+
+Schemi e utenti
+user : è un utente del db dotato di nome e password
+schema : insieme di oggetti che appartengono a tale account
+utenti default
+sys e system sono utenti creati di default
+
+grante : privileggio di svolgere una specifica operazione
+ruolo : insieme di privilegi
+grazie hai grant o ruoli, possiamo fare:
+
+connect : ruolo base per connetersi al db e creare sessioni
+resource : concede diritti per la creazione e la manipolazione di vari tipi di oggetti
+dba : ha tutti i privileggi di sistema, e la capacita di concedere i privileggi ad altri utenti
+Applicazione standard customizzata
+Un caso tipico di applicazione gestionale è quella in cui conivivono un pacchetto preinstallato su cui è necessario implementare personalizzazioni.
+Ad esempio, la standard application possono essere:
+
+Oracle ERP
+Billing Siebel
+CRM
+…
+Tipi di oggetti
+tabella : elemento di memorizzazione di un record strutturato
+tabelle temporanee : tabella che vive solo all’interno di una sessione
+indice : struttura di dati atta a ottimizzare le prestazioni di ricerca
+Vista : rappresenta una query che può essere utilizzata in forma di tabella
+vista materializzate : è una vista in cui i dati vengono storicizati in modo fisico
+tipo : strutture composite definite a partire da tipi dato standartd
+sequenza : oggetto del database finalizzato a generare valori interi univoci
+sinonimo : alias per oggetti di database
+bd link : strumento per accedere/inserire/cancellare un oggetto su un altro database
+procedura : programma scritto in Plsql che ammette parametri input/output
+funzione : rispetto alla procedura restituisce un valore
+package : raccolta di procedure e funzioni
+trigger progedura PL/Sql attivata ad eventi (es: una volta che inserisci una riga qua fai un update da un’altraparte)
+Giorno 2
+Concetti Sql, DDl, DML, Select, join, operazioni e funzioni
+Il linguaggio SQL è il linguaggio standard per la definizione, manipolazione è interrogazione delle basi di dati relazionali
+
+tipi di dati
+dati alfanumerici : char, varchar, varchar2, nchar, nvarchar2
+numerici : number, float, double
+date e orari : date (anno,mese,giorno, minuti e secondi)
+dati binari e grandi formati: binary(n), lob (solitamente usata per immagini o xml)
+DDL
+i comandi ddl (data definition language) permette di creare, modificare o eliminare gli oggetti di uno schema del database
+
+create table : crea tabella
+alter table: modifica struttura tabella
+rename : cambia nome tabella
+truncate table : elimina tutte le righe della tabella
+drop table : elimina la tabella, non consente il rollback
+DML
+i comandi DML (data manipulation language) consentono di leggere, inserire, modificare o eliminare i dati in un database
+
+insert : inserisce righe nella tabella
+delete : cancella righe della tabella
+update : modifica valori inseriti nella tabella
+alla fine dopo aver usato questi comandi bisogna fare il COMMIT
+
+DCL
+i comandi DCL (data control language) consentono fornire o revocare agli utenti i permessi necessari per poter utilizzare i comandi DDL e DML
+
+Grant : permette assegnare permessi agli ogetti del database
+Revoke : elimina i permessi
+Select
+select serve a selezionare i dati sulle tabelle
+
+selezioni
+ordinamento
+raggruppamento
+query gerarchiche
+struttura select
+select listaDiAttributi
+from listaTabelle
+where condizioniSemplici
+group by RagruppamentoListaAttributi
+having condizioniAggregate
+order by
+
+count e dinstinct
+count(disintc nome colonna)
+
+Operatori e funzioni
+sono riportate solo alcune funzioni, cioè solo quelle piu usate, ma in realta ci sono tante altre funzioni per le strinhe, per i numeri…
+
+funzioni stringhe
+
+trim
+left
+len
+substring
+upper
+funzioni numeri
+
+abs
+round
+trunc
+mod
+sign
+funzioni di conversione
+
+to_char
+to_date
+to_number
+date funzioni e rappresentazione
+
+trunc
+add_month
+sysdate
+gestione null
+
+nvl(val1,val2) : funzione che mostra val2 se val1 è null, altrimenti mostra val1. Val 2 deve essere dello stesso tipo di val1
+espressioni regolari, decode( è un IF),case
+
+operator oracle
+
+between
+in
+is null
+like
+operatori insiemistici
+
+Union
+Union All
+intersect
+minus
+Giorno 3
+PlSql
+commit e rollback sono delle azioni definitive fatte sul db
+
+Cosa è PL SQL?
+è un linguaggio di programazzione procedurale, consente la dichiarazione di variabili, uso di cicli e gestione degli errori.
+dopo aver creato una procedura o funzione bisogna fare il commit per salvare il lavoro fatto dalla procedura o funzione sul db.
+I programmi PL/SQL sono di due tipi:
+
+Blocco anonimo: blocco che viene utilizzato da un applicazione ma non ha un nome definito, quindi non viene memorizzato sul db
+Stored Procedure : blocco che oracle compila e momorizza nel database e che può nessere richiamato da altri blocchi PLSQL, da programmi esterni(shell unix…),…
+Blocco anomimo esempio
+declare
+variabile_1
+…
+begin
+select…
+…
+oppure oltre alla select si puo usare EXCEPTION (che spiegherò dopo)
+
+end;
+
+Blocco procedurale esempio
+aggiungere dopo il create replace, perche se si vuole modificare la procedura una volta creata bisogna eliminarla e riscriverla, con replace si aggira questo problema.
+
+Quando si crea una procedura e buona norma all’inizio della procedura inserire dei commneti, che sono:
+
+commento generio
+nome e cognome autore
+nome o codice progetto
+data di creazione
+storia delle modifiche
+negli argomneti pasatti alla procedura va specificato se sono argomenti di input o output tra il nome e il tipo
+
+create [or replace] procedure [nome_utente.]nome_procedura (argomento1 out/in tipo_argo,…) IS
+dichiarazione variabili
+dichiarazione cursori
+…
+BEGIN
+select
+…
+eccezioni
+…
+END
+
+ci sono 2 modi come eseguire la procedura:
+Execute nome_procedura
+Declare
+dichiarazioni variabili…
+Begin
+Nome_procedura
+End;
+Costrutti di base
+dichiarazione variabili:
+nome_variabile Number(precisione,scale);
+nome_variabile DATE;
+nome_variabili varchar2(max_lunghezza);
+nome_colonna nome_tabella.nome_colonna%TYPE; (cosi prende direttamente il tipo di dato di quella colonna)
+nomeù_riga tableName ore view or cursore %ROWTYPE; questa variabile diciamo che diventa un oggetto java e avra tanti campi come la tabella
+
+nomeCostante varchar2(20) := ‘TEST’;
+COSTANTE EXCEPTION_X EXCEPTION;
+
+struttura condizionale esempio:
+declare
+a number :=10;
+b number :=8;
+begin
+if a>b then
+dbms_output.put_line(‘A maggiore di b’) stampa a video
+elsif a<b then
+dbms_output.put_line(‘A minore di b’)
+end if;
+end
+strutture iterattive
+for:
+for variabile in(1…N) LOOP
+istruzione
+END LOOP;
+while:
+while condizione LOOP
+istruzione
+END LOOP;
+ulteriore esempio un po strano che esce quando si verifica il when
+LOOP
+istruzione
+exit when condizione a
+end lopp;
+Cursori
+i cursori sono delle query inserite dentro un loop, i cursori permettono di estrarre più record ed eseguire condizioni su ciascun record estratto. Il cursore può essere dichiarato o meno. Per essere utilizzato deve essere aperto,fatto scorrere e poi chiuso.
+Esempio cursore
+
+declare
+cursor nome_cursore is select * from employee;
+v_record employee%rowtype;
+
+begin
+open nome_cursore;
+
+loop
+
+fetch nome_cursore into v_record; // fetch prende una riga dal cursore e la inietta in v_record
+exit when nome_cursore%notfound; // esci dal ciclo quando il cursore non punta piu a nulla
+dbms_output.put_line(v_record.name);
+
+end loop;
+close nome_cursore;
+end;
+
+aggiornamento dati tramite i cursori
+declare
+cursor nome_cursore is select * from employee;
+v_record employee%rowtype;
+
+begin
+open nome_cursore;
+
+loop
+
+fetch nome_cursore into v_record;
+exit when nome_cursore%notfound;
+–dbms_output.put_line(v_record.name);
+update employee
+set salary = 980
+where name = v_record.name;
+
+end loop;
+close nome_cursore;
+end;
+
+cursore implicito
+declare
+begin
+for rec in (select * from employee) loop
+dbms_output.put_line(rec.name);
+end loop;
+end
+
+OPPURE
+declare
+cursor c is select * from employee
+begin
+for rec in c loop
+dbms_output.put_line(rec.name);
+end loop;
+end
+
+cursore con parametri
+declare
+cursor c(min,max) is select * from employee where salary >min and salary<max
+
+begin
+for rec in c(800,1600) lopp
+…
+end loop
+end
+
+Procedure Funzioni Packages
+procedura : è un insieme di comandi eseguito con ordine. Può avere dei parametri in Input e Output, ma non puo essere utilizzata in una istruzione select
+funzione : è un insieme di comandi che accetta dei parametri Input/output ed eseguita restituisce sempre un risultato al chiamante. Può essere usata in una istruzione select
+packages : è un insieme di procedure/funzioni,costanti e variabili riunite in un unico oggetto. E sempre composto da due parti distinte
+Specification : dichiarazione nomi delle procedure o funzioni
+body : implementazione delle procedure o funzioni
+Creazione di una funzione
+E molto simile alla procedura ma ci restituisce sempre un risultato, va dichiarata nel seguente modo
+
+create ore replace function nome_funzione(va1 in varchar, var2 int out Integer)
+return <Tipo del Dato che vogliamo che ci restituisca STring…, in questo caso Integer> is
+dichiarazione variabili
+begin
+…
+return valore che vogliamo
+end
+
+al posto del cursore si puo fare questo che e un piccolo esempip
+V_ruolo varchar(20)
+begin
+select job
+into V_ruolo
+from employee
+…
+–
+
+Non ho usato un cursore pero grazie a into ho salvato in V_ruolo una colonna
+
+richiamare una funzione
+select nome_funzione(parametri) from dual
+
+Piccolo esempio di funzione e eccezione
+create…
+
+beign
+…
+if()
+return 1
+else
+return 0
+
+EXCEPTION
+when no_data_found then // no_data_found e un tipo di ecezzione, funzione cosi tiroena -1
+return -1
+when altro tipo di ecezzione then
+return -2
+…
+
+end
+
+Packages
+ATTENZIONE tra la specifica e il body va rispettato lordine delle dichiarazione e scriture delle procedure
+
+Specifica del packages
+create or replace package nome_package as
+procedure nome_procedura1 (…)
+procedure nome_procedure2(…)
+end nome_packages;
+
+Body
+create or replace package body nome_package as
+procedure nome_procedure1(…)
+corpo procedura
+end procedure nome_procedure1
+
+procedure nome_procedure2(…)
+corpo procedura
+end procedure nome_procedure2
+end nome_package
+
+Commit and Rollback
+Rollback viene usato di piu nelle exception
+
+EXCEPTION ed errori
+sono utili per intercettare errori. Le eccezioni possono essere
+
+definite dall’utente
+definite dal sistema
+ecezzioni di sistema principali
+no_data_found : viene sollevata da una select, non recupera una riga
+dup_val_on_index : viene sollevata se si viola la primary key
+TOO_MANY_ROWS : viene sollevata se una query recupera piu righe al posto di una sola
+INVALID_NUMBER : viene sollevat se la conversiona di una stringa a numero fallisce
+INVALID_CURSOR : viene sollevata se si esegue delle operazioni sul cursore non consentite
+CURSOR_ALREADY_OPEN : viene sollevata quando si cerca di aprire un cursore gia aperto
+OTHERS : viene sollevta per gestire tutti i tipi di errori
+per scatenare a bella posta l’ecezzione fare RAISE e nome_eccezione
+
+stampa degli errori
+dbms_uotput.put_line(‘messagio errore’ || SQLERRM || ‘codice errore’ || SQLCODE )
+
+Giorno 4 RIVEDERLA O CAPIRE MRGLIO QUESTA LEZIONE
+PL/SQL AVANZATO
+SavePoint: inserire un savepoint nel codice significa permettere alla istruzione rollback di avere effetto soltanto fino al punto di rollback ???
+Da quello che ho capito il save point permette alla rollback di avere un effetto fino ad un certo punto.
+
+getsione transazioni :
+Locking Select for update :
+???
+questa procedura dovrebbe bloccare un area della tabella, che solo io come utente momentaneamente posso usare
+cosi mi è sembrando di capire
+
+Autonomus Transaction :
+
+Rivedere parte 1 in caso
+
+Tipi Avanzati
+record
+possono essere dichiarati nei package (no body)
+definisco io un tipo, come un oggetto : type nome_record is Record(variabile tipo, variabile tipo,…);
+tabelle
+possono essere dichiarati nei package (no body)
+cursori referenziali (is ref cursor)
+Sql dinamico
+Execute Immediate ??
+Dovrebbe essere che in una procedura/funzione ho una stringa dove io salvo per esempio il comando select * from…
+e questa stringa io la passo in un altra query, in poche parole ma mia stringa quindi e un pezzo di istruzione, e quindi forse bisogna fare excetute immediate e nome della variabile dove è salvato il comando sql.
+Il tutto forse e usato per comandi DDL.
+
+Parallelismo
+Applicare il parallelismo dove ci sono problemi di performance (la query lenta).
+Dividere il tutto il piu processi quindi multi thread diciamo.
+Per fare paralellismo si una una funzione chiamata “ora_hash”.
+
+Giorno 5
+Procedure PL/sql vs query massive (Paradigma procedurale)
+Paradigma procedurale vs query massive
+l’uso dei cicli e dei cursori, costringe il server Oracle ad eseguire singolarmente le istruzioni DML
+se per eseguire una istruzione dml ci vuole un secondo, per n istruzioni ci vogliono n secondi
+grazie alle query massive si riesce a scrivere il codice piu facilmente
+con le query massive il costo computazionele si riduce
+P.S fare le prove per vedere se e meglio il paralellismo o le query massive per determinate operazioni
+
+La clausola WITH nel costrutto select (subquery factoring)
+with consente di materializzare una sottoquery che viene riferita piu volte in una query principale
+sintassi with
+with nomeSubquery as (select…)
+nella select principale usare il nome della subQuery di sopra come se fosse una tabella
+
+ATTENZIONE
+se noi vogliamo che la sub query venga fatta e messa in memoria da oracle bisogna fare cosi:
+with nomeSubquery as (select /+MATERIALIZZE/ …)
+se la sub query e troppo grande e quindi non la vogliamo in memoria al soto di materializze mettere INLINE
+Fare le prove per vedere se per quella query e meglio MATERIALIZZE e INLINE.
+Di default dovrebbe essere settato INLINE.
+
+insert massive, Insert multipli e merge
+insert into tabella1 (nome,cognome)
+select tnome,cognome from tabella 2 where salario>100
+
+Cosa succede qua sopra che va ad inserire nella tabella 1 tutti i valori sella select che rispettano quella where
+
+Creazione di una tabella massiva:
+create table tabella1 as
+select * from tabella 2
+questa scrittura va a creare la tabella 1 con tutte le colonne della select cosi da evitare noi di inserire manualmente le colonne con il loro tipo
+
+insert multipli :
+insert all
+into tabella1 value (nome,cognome)
+into tabella3 value (nome,cognome)
+select tnome,cognome from tabella 2 where salario>100
+
+si puo fare anche un inser singolarmente per ogni tabella con delle condizioni diverse
+inser multipli Pivot (scambia le righe con le colonne)
+
+MERGE
+l’istruzione MERGE consente di eseguire in un unico comando una UPDATE per un insieme di record della tabella target e contestualmente una INSERT di un insieme ri record sempre nella tabella target a partire da una sorgente di dati (tabella,vista o subquery). E’ possibile specificare una condizione, a seconda del fatto che questa condizione sia vera o falsa, inserire nuovi record oppure aggiornare i record.
+
+la sinsassi e un po strana, vederla al momento del bisogno
+ETL
+Ambito ETL forse: supponiamo di dover aggiornare una tabella di destinazione con dati contenuti in una tabella sorgente e contestualmente di doerli elaborare prima dell’inserimento.
+
+Errlog
+log di errori messi dentro una tabella di log, simili a log4j in java
+
+Bulk Collect
+se dobbiamo usare il for, utilizziamo il bulk collect vedere qualche esempio su internet.
+riduce i tempi.
+
+Recycle bin e traking change
+recuperare delle cose dentro un cestino.
+
+oracle conserva le tabelle eliminate dentro il suo cestino, ecco come vedere
+select * from recyclebin
+recupero della tabella nel cestino
+flashback table nome tabella to before drop
+svuotare definitivamente il cestino
+purge recyclebin
+usando il nome inetrno della tabella cioe Object name, che lo vediamo quando facciamo select * from recyclebin possiamo tipo fare delle query anche se quella tabella e dentro il cestino
+
+tracking changes
+recuperare una un qualcosa che cera prima del commit
+
+vedere i commiti effettuati su una tabella
+select * from nome tabella versions between scn minvalue and maxvalue
+PRATICO
+cicli
+if
+procedure
+funzioni
+packages
+errorri
+query massive
+with
+insert multipli
+tabelle massive
+merge
+messaggi di log???
+bulk collect
