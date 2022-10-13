@@ -1,5 +1,3 @@
-# NodeJs-Express
-
 NPM
 NPM e il gestore di pacchetti per javascript
 NPM va usato nel cmd e tipo un sudo di linux
@@ -38,3 +36,5 @@ Cartelle
 nella cartella assert va il css e immagini.
 nella cartella views vanno le pagine ejs
  allinterno si fa una cartella di nome partials che vanno i pezzi in ejs tipo navBar 
+Info tunnel
+Poiche si vede il file .js quando si ispeziona una pagina web si puo usare un sito, dove si incolla il codice js e lui lo codifica in modo strano producendo un testo illegibile, dopo di che prendere questo testo e metterlo nel file del js il compilatore comunque lo leggera tranquillamente. il sito in questione è :  obfuscator
